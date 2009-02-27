@@ -1,0 +1,3 @@
+SOURCEPKG=libevent1
+BUILDDIR=libevent-1.3e
+

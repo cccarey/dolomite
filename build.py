@@ -6,8 +6,6 @@ import warnings
 warnings.filterwarnings('ignore','.*apt API not stable yet.*')
 import apt
 
-TOOLS_BIN_FOLDER = 'tmp/tar/dolomite-env/bin'
-
 def create_dir(name):
     if not os.path.exists(name):
         #os.mkdir(name)
@@ -23,13 +21,6 @@ def dependenciesMet(packages):
             met = False
     return met
 
-def copy_built_files(files, build_dir):
-    if type(files) is list:
-        for f in files:
-            shutil.copy('tmp/%s/%s' % (build_dir, f), TOOLS_BIN_FOLDER)
-    else:
-        shutil.copy('tmp/%s/%s' % (build_dir, files), TOOLS_BIN_FOLDER)
-        
 def usage():
     print("Usage: %s component_name" % sys.argv[0])
     
@@ -37,11 +28,11 @@ def get_config(component):
     config_file = open("%s-conf" % component)
     config = { }
     for setting in config_file:
-        if len(setting.split('=')) > 1:
+        if len(setting.split('=',1)) > 1:
             if (len(setting.split(' '))) > 1:
-                config[setting.split('=')[0]] = setting.rstrip('\n').split('=')[1].split(' ')
+                config[setting.split('=',1)[0]] = setting.rstrip('\n').split('=',1)[1].split(' ')
             else:
-                config[setting.split('=')[0]] = setting.rstrip('\n').split('=')[1]
+                config[setting.split('=',1)[0]] = setting.rstrip('\n').split('=',1)[1]
     return config
 
 def main():
@@ -54,30 +45,44 @@ def main():
 
     config = get_config(component)
     
-    create_dir(TOOLS_BIN_FOLDER)
+    create_dir('tmp')
 
     os.chdir('tmp')
 
-    print("checking build depedencies...")
-    if not dependenciesMet(config['BUILDDEP']):
-        print("install dependencies using the following command and try again")
-        print("sudo apt-get install %s" % " ".join(config['BUILDDEP']))
-        sys.exit(1)
+    if 'BUILDDEP' in config:
+        print("checking build depedencies...")
+        if not dependenciesMet(config['BUILDDEP']):
+            print("install dependencies using the following command and try again")
+            print("sudo apt-get install %s" % " ".join(config['BUILDDEP']))
+            sys.exit(1)
         
     print("downloading source...")
-    try:
-        proc.check_call(['wget','-c', '%s/%s' % (config['SOURCEPATH'], config['SOURCETARFILE'])])
-    except proc.CalledProcessError:
-        sys.exit(1)
+    if 'SOURCEPATH' in config:
+        try:
+            proc.check_call(['wget','-c', '%s/%s' % (config['SOURCEPATH'], config['SOURCETARFILE'])])
+        except proc.CalledProcessError:
+            sys.exit(1)
+    elif 'SOURCEPKG' in config:
+        try:
+            proc.check_call(['apt-get','source',config['SOURCEPKG']])
+        except proc.CalledProcessError:
+            sys.exit(1)
 
-    print("extracting tar ball...")    
-    memcached = tarfile.open(name=config['SOURCETARFILE'], mode='r:gz')
-    memcached.extractall()
+    if 'SOURCETARFILE' in config:
+        print("extracting tar ball...")    
+        memcached = tarfile.open(name=config['SOURCETARFILE'], mode='r:gz')
+        memcached.extractall()
     
     print("configuring...")
     os.chdir(config['BUILDDIR'])
+    cmdline = ['./configure','--prefix=%s/../tar/dolomite-env' % os.getcwd(),'--mandir=/tmp/dump']
+    if 'CONFIGEXTRA' in config:
+        if type(config['CONFIGEXTRA']) is list:
+            cmdline.extend(config['CONFIGEXTRA'])
+        else:
+            cmdline.append(config['CONFIGEXTRA'])
     try:
-        proc.check_call(['./configure'])
+        proc.check_call(cmdline)
     except proc.CalledProcessError:
         sys.exit(1)
         
@@ -87,9 +92,11 @@ def main():
     except proc.CalledProcessError:
         sys.exit(1)
 
-    print("copying built files...")
-    os.chdir('../..')
-    copy_built_files(config['INSTALLFILES'], config['BUILDDIR'])
+    print("installing files...")
+    try:
+        proc.check_call(['make','install'])
+    except proc.CalledProcessError:
+        sys.exit(1)
     
 if __name__ == "__main__":
     main()
