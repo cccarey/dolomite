@@ -1,5 +1,5 @@
 #!/bin/bash
-UBUNTUTOOLS="tools-ubuntu-8.10-2009.02.26.1644.tgz"
+UBUNTUTOOLS="tools-ubuntu-8.10.200902281039.tgz"
 
 virtualenv dolomite-env
 source dolomite-env/bin/activate
