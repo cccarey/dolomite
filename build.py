@@ -47,7 +47,9 @@ def main():
     
     create_dir('tmp')
 
+    basedir = os.getcwd()
     os.chdir('tmp')
+    buildPrefix = "/".join([os.getcwd(), 'tar/dolomite-env'])
 
     if 'BUILDDEP' in config:
         print("checking build depedencies...")
@@ -75,7 +77,10 @@ def main():
     
     print("configuring...")
     os.chdir(config['BUILDDIR'])
-    cmdline = ['./configure','--prefix=%s/../tar/dolomite-env' % os.getcwd(),'--mandir=/tmp/dump']
+    configcmd = './configure'
+    if 'CONFIGOVERRIDE' in config:
+        configcmd = config['CONFIGOVERRIDE']
+    cmdline = [configcmd,'--prefix=%s' % buildPrefix,'--mandir=/tmp/dump']
     if 'CONFIGEXTRA' in config:
         if type(config['CONFIGEXTRA']) is list:
             cmdline.extend(config['CONFIGEXTRA'])
@@ -98,5 +103,10 @@ def main():
     except proc.CalledProcessError:
         sys.exit(1)
     
+    os.chdir(basedir)
+    if 'POSTBUILDCLEANUP' in config:
+        print("running post build cleanup command")
+        proc.check_call([config['POSTBUILDCLEANUP']])
+        
 if __name__ == "__main__":
     main()
