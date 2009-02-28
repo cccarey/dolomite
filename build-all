@@ -7,6 +7,16 @@ function die()
 
 rm -rf tmp
 
+./build.py libevent
+if [ ! $? -eq 0 ]; then
+    die "Encountered error building libevent.  Check messages and try again."
+fi
+
+./build.py db4.7-util
+if [ ! $? -eq 0 ]; then
+    die "Encountered error building db4.7-util (Berkely DB).  Check messages and try again."
+fi
+
 ./build.py memcached
 if [ ! $? -eq 0 ]; then
     die "Encountered error building memcached.  Check messages and try again."
