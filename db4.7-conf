@@ -1,5 +1,6 @@
 CONFIGOVERRIDE=../dist/configure
-SOURCEPKG=db4.7-util
+SOURCETARFILE=db-4.7.25.tar.gz
+SOURCEPATH=http://download.oracle.com/berkeley-db
 BUILDDIR=db-4.7.25/build_unix/
 CONFIGEXTRA=--docdir=/tmp/dump
 POSTBUILDCLEANUP=./db4.7.cleanup

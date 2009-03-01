@@ -12,9 +12,9 @@ if [ ! $? -eq 0 ]; then
     die "Encountered error building libevent.  Check messages and try again."
 fi
 
-./build.py db4.7-util
+./build.py db4.7
 if [ ! $? -eq 0 ]; then
-    die "Encountered error building db4.7-util (Berkely DB).  Check messages and try again."
+    die "Encountered error building db4.7-util (Berkeley DB).  Check messages and try again."
 fi
 
 ./build.py memcached

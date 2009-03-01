@@ -1,3 +1,4 @@
-SOURCEPKG=libevent1
+SOURCETARFILE=libevent-1.3e.tar.gz
+SOURCEPATH=http://www.monkey.org/~provos
 BUILDDIR=libevent-1.3e
 
