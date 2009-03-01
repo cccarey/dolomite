@@ -22,11 +22,15 @@ def run_tests():
 
     test_suite.run(results)
     
-    if results.wasSuccessful:
+    if results.wasSuccessful():
         print("Memcached test passed... your foundation is solid!")
     else:
-        print("Failed!")
+        print("Memcached test Failed!\n")
         print(results)
+        print("")
+        print(results.errors)
+        print("")
+        print(results.failures)
         
     
 if __name__ == "__main__":
