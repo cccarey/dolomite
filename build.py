@@ -3,14 +3,22 @@ import os, sys, tarfile, shutil
 import subprocess as proc
 import warnings
 
+'''
+Trying this out without the dependency on apt, so it can be run
+on other platforms
+
 warnings.filterwarnings('ignore','.*apt API not stable yet.*')
 import apt
+'''
 
 def create_dir(name):
     if not os.path.exists(name):
         #os.mkdir(name)
         os.makedirs(name)
-        
+
+'''
+Trying this out without the dependency on apt, so it can be run
+on other platforms
 def dependenciesMet(packages):
     met = True
     cache = apt.Cache()
@@ -20,6 +28,7 @@ def dependenciesMet(packages):
             print("%s package is not installed." % package)
             met = False
     return met
+'''
 
 def usage():
     print("Usage: %s component_name" % sys.argv[0])
@@ -51,13 +60,17 @@ def main():
     os.chdir('tmp')
     buildPrefix = "/".join([os.getcwd(), 'tar/dolomite-env'])
 
+    '''
+    Trying this out without the dependency on apt, so it can be run
+    on other platforms
     if 'BUILDDEP' in config:
         print("checking build depedencies...")
         if not dependenciesMet(config['BUILDDEP']):
             print("install dependencies using the following command and try again")
             print("sudo apt-get install %s" % " ".join(config['BUILDDEP']))
             sys.exit(1)
-        
+    '''
+            
     print("downloading source...")
     if 'SOURCEPATH' in config:
         try:
