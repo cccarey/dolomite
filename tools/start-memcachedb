@@ -1,0 +1,13 @@
+#!/bin/bash
+export LD_LIBRARY_PATH=$VIRTUAL_ENV/lib
+
+if [ ! -d $VIRTUAL_ENV/log ]; then
+    mkdir $VIRTUAL_ENV/log
+fi
+
+echo -n "Starting memcachedb... "
+memcachedb -p21201 -d -r -H $VIRTUAL_ENV/db -N -v &> $VIRTUAL_ENV/log/memcachedb
+echo "running"
+
+test-memcachedb
+
